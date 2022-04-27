@@ -90,4 +90,4 @@ function doubleBarrT(n)
 	savefig(pl1,"situation3.pdf")
 end
 
-doubleBarrT(100)
+doubleBarrT(1000)
