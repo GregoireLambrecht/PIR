@@ -81,6 +81,7 @@ function doubleBarrT(n)
 	ϵres = argmax(T) * V/n #L'energie de resonnance en eV
 	ϵres = (round(ϵres * 10000))/10000 #On arrondie
 	Γ = Largeur(T,0.01)*(V/n) #La largeur à mi-hauteur
+	Γ = (round(Γ * 100000))/100000 #On arrondie
 	pl1 = plot(E./eV,T,xlabel = "Energie en eV, ϵres = $ϵres eV, Γ = $Γ eV" ,ylabel = "T(E)", title = "T(E) avec L1 = L2 = Lp = $l nm et V1 = V2 = $V eV")
 	savefig(pl1,"situation1.pdf")
 	#Situation 2 V1 = 2 V2
