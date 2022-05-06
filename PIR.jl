@@ -71,7 +71,7 @@ end
 function doubleBarrT(n)
 	V = 0.4
 	l = 3
-	E = [1/n*V*eV*i for i=1:(n-1)]
+	E = [(i/n)*V*eV for i=1:(n-1)]
 	T = zeros(n-1)
 	#Premiere situation
 	for k=1:(n-1)
@@ -80,7 +80,7 @@ function doubleBarrT(n)
 	end
 	ϵres = argmax(T) * V/n #L'energie de resonnance en eV
 	ϵres = (round(ϵres * 10000))/10000 #On arrondie
-	Γ = Largeur(T,0.001)/n #La largeur à mi-hauteur
+	Γ = Largeur(T,0.01)*(V/n) #La largeur à mi-hauteur
 	pl1 = plot(E./eV,T,xlabel = "Energie en eV, ϵres = $ϵres eV, Γ = $Γ eV" ,ylabel = "T(E)", title = "T(E) avec L1 = L2 = Lp = $l nm et V1 = V2 = $V eV")
 	savefig(pl1,"situation1.pdf")
 	#Situation 2 V1 = 2 V2
@@ -99,7 +99,5 @@ function doubleBarrT(n)
 	pl1 = plot(V2./eV,T,xlabel = "V2 en eV",ylabel = "T(V2)", title = "T(V2), L1=L2=Lp=$l nm, V1=$V eV, E=$ϵres eV")
 	savefig(pl1,"situation3.pdf")
 end
-
-
 
 doubleBarrT(10000)
