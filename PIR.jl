@@ -1,3 +1,4 @@
+using "tools.jl"
 using Plots
 
 const ħ=6.63e-34
@@ -89,5 +90,7 @@ function doubleBarrT(n)
 	pl1 = plot(V./eV,T,xlabel = "V2 en eV",ylabel = "T(V2)", title = "T(V2), L1 = L2 = Lp = 1 nm, V1 = 1eV, E = 0.4 eV")
 	savefig(pl1,"situation3.pdf")
 end
+
+
 
 doubleBarrT(1000)
