@@ -40,21 +40,25 @@ function init_Barr(ϵ,L,V)
 	Barr(L,V,ϵ,k,K,r,t,T,R,N)
 end
 
-function TraceT(n)
-	E = [1/n*eV*i for i=1:(n-1)]
-	T = zeros(n-1)
-	for k=1:(n-1)
-		P = init_Barr(nm,eV,E[k])
-		T[k] = P.T
-	end
-	plot(E./eV,T)
-	(T,E./eV)
+#Vp >= 0
+function init_Puit(ϵ,Lp,Vp)
+	k = sqrt(2m*ϵ)/ħ
+	K = sqrt(2m*(Vp+ϵ))/ħ
+	r = 0
+	t = exp(-1im*K*Lp)
+	T = 1
+	R = 0
+	N = zeros(ComplexF64, 2,2)
+	N[1,1] = 1/conj(t)
+	N[2,2] = 1/t
+	Barr(Lp,Vp,ϵ,k,K,r,t,T,R,N)
 end
 
-function ParamDB(ϵ,V1,V2,L1,L2,Lp)
+function ParamDBsimple(ϵ,V1,V2,L1,L2,Lp)
 	Bar1 = init_Barr(ϵ,L1,V1)
 	Bar2 = init_Barr(ϵ,L2,V2)
-	N = Bar1.N * Bar2.N
+	Puit = init_Puit(ϵ,Lp,0)
+	N = Bar1.N*Puit.N*Bar2.N
 	k = Bar1.k
 	t = 1/conj(N[1,1])
 	r = N[1,2]*t
@@ -73,28 +77,29 @@ function doubleBarrT(n)
 	l = 3
 	E = [(i/n)*V*eV for i=1:(n-1)]
 	T = zeros(n-1)
+	Lp = l/3
 	#Premiere situation
 	for k=1:(n-1)
-		(t,r,A1,B1,α,β,A2,B2) = ParamDB(E[k],V*eV,V*eV,l*nm,l*nm,l*nm)
+		(t,r,A1,B1,α,β,A2,B2) = ParamDBsimple(E[k],V*eV,V*eV,l*nm,l*nm,Lp*nm)
 		T[k] = real.(t't)
 	end
 	ϵres = argmax(T) * V/n #L'energie de resonnance en eV
 	ϵres = (round(ϵres * 10000))/10000 #On arrondie
 	Γ = Largeur(T,0.01)*(V/n) #La largeur à mi-hauteur
 	Γ = (round(Γ * 100000))/100000 #On arrondie
-	pl1 = plot(E./eV,T,xlabel = "Energie en eV, ϵres = $ϵres eV, Γ = $Γ eV" ,ylabel = "T(E)", title = "T(E) avec L1 = L2 = Lp = $l nm et V1 = V2 = $V eV")
+	pl1 = plot(E./eV,T,xlabel = "Energie en eV, ϵres = $ϵres eV, Γ = $Γ eV" ,ylabel = "T(E)", title = "T(E), L1=L2=$l nm Lp=$Lp nm, V1=V2=$V eV")
 	savefig(pl1,"situation1.pdf")
 	#Situation 2 V1 = 2 V2
 	for k=1:(n-1)
-		(t,r,A1,B1,α,β,A2,B2) = ParamDB(E[k],2*V*eV,V*eV,l*nm,l*nm,l*nm)
+		(t,r,A1,B1,α,β,A2,B2) = ParamDBsimple(E[k],2*V*eV,V*eV,l*nm,l*nm,Lp*nm)
 		T[k] = real.(t't)
 	end
-	pl1 = plot(E./eV,T,xlabel = "Energie en eV",ylabel = "T(E)", title = "T(E) avec L1 = L2 = Lp = $l nm et V2 = V1/2 = $V eV")
+	pl1 = plot(E./eV,T,xlabel = "Energie en eV",ylabel = "T(E)", title = "T(E), L1=L2=$l nm Lp=$Lp nm, V2=V1/2=$V eV")
 	savefig(pl1,"situation2.pdf")
 	#Situation 3, V2 varie, ϵ = 0.4 eV
 	V2 = [(eV*V/2) *(1 + 2*i/n) for i = 1:(n-1)]
 	for k=1:(n-1)
-		(t,r,A1,B1,α,β,A2,B2) = ParamDB(ϵres*eV,V*eV,V2[k],l*nm,l*nm,l*nm)
+		(t,r,A1,B1,α,β,A2,B2) = ParamDBsimple(ϵres*eV,V*eV,V2[k],l*nm,l*nm,Lp*nm)
 		T[k] = real.(t't)
 	end
 	pl1 = plot(V2./eV,T,xlabel = "V2 en eV",ylabel = "T(V2)", title = "T(V2), L1=L2=Lp=$l nm, V1=$V eV, E=$ϵres eV")
