@@ -12,9 +12,12 @@ const nm = 1e-9 #Le nanométre
 
 mutable struct Barr
 	L
+	Vd
 	V
+	Vg
 	ϵ
-	k
+	kd
+	kg
 	K
 	r
 	t
@@ -23,7 +26,8 @@ mutable struct Barr
 	N
 end
 
-function init_Barr(ϵ,L,V)
+
+function init_BarrSimple(ϵ,L,V)
 	k = sqrt(2m*ϵ)/ħ
 	K = sqrt(2m*(V-ϵ))/ħ
 	κ1 = k*k - K*K
@@ -37,7 +41,7 @@ function init_Barr(ϵ,L,V)
 	N[1,2] = r/t
 	N[2,1] = conj(r)/conj(t)
 	N[2,2] = 1/t
-	Barr(L,V,ϵ,k,K,r,t,T,R,N)
+	Barr(L,0,V,0,ϵ,k,k,K,r,t,T,R,N)
 end
 
 #Vp >= 0
@@ -51,15 +55,15 @@ function init_Puit(ϵ,Lp,Vp)
 	N = zeros(ComplexF64, 2,2)
 	N[1,1] = 1/conj(t)
 	N[2,2] = 1/t
-	Barr(Lp,Vp,ϵ,k,K,r,t,T,R,N)
+	Barr(Lp,0,Vp,0,ϵ,k,k,K,r,t,T,R,N)
 end
 
 function ParamDBsimple(ϵ,V1,V2,L1,L2,Lp)
-	Bar1 = init_Barr(ϵ,L1,V1)
-	Bar2 = init_Barr(ϵ,L2,V2)
+	Bar1 = init_BarrSimple(ϵ,L1,V1)
+	Bar2 = init_BarrSimple(ϵ,L2,V2)
 	Puit = init_Puit(ϵ,Lp,0)
 	N = Bar1.N*Puit.N*Bar2.N
-	k = Bar1.k
+	k = Bar1.kd
 	t = 1/conj(N[1,1])
 	r = N[1,2]*t
 	A1 = 1 + r
@@ -72,7 +76,7 @@ function ParamDBsimple(ϵ,V1,V2,L1,L2,Lp)
 	(t,r,A1,B1,α,β,A2,B2)
 end
 
-function doubleBarrT(n)
+function doubleBarrTsimple(n)
 	V = 0.4
 	l = 3
 	E = [(i/n)*V*eV for i=1:(n-1)]
@@ -106,4 +110,5 @@ function doubleBarrT(n)
 	savefig(pl1,"situation3.pdf")
 end
 
-doubleBarrT(10000)
+
+doubleBarrTsimple(10000)
